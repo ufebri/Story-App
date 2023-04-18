@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Stories</string>
+
+    <!--  Form Login & Register  -->
+    <string name="text_login_register_now">New to Stories? Register</string>
+    <string name="text_register_login_now">Already member? Login</string>
+
+
+    <!--  General Text  -->
+    <string name="text_general_email">Email</string>
+    <string name="text_general_password">Password</string>
+    <string name="text_general_login">Login</string>
+    <string name="text_general_signup">Sign up</string>
+    <string name="text_general_name">Name</string>
+
+    <!--  Error Rules  -->
+    <string name="name_error_rules">Name is required</string>
+    <string name="password_error_rules">Minimal 8 Character</string>
+    <string name="email_error_rules">Email is required</string>
+
+
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
+    <string name="logout">Logout</string>
+    <string name="description">Description</string>
+    <string name="upload">Upload</string>
+    <string name="add_stories">Post</string>
+
+
+</resources>
