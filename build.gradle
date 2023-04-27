@@ -21,4 +21,6 @@ ext {
     gplay_version = '21.0.1'
     dataStore_version = '1.0.0'
     nav_version = '2.5.3'
+    room_version = '2.5.1'
+    paging_version = '3.1.1'
 }

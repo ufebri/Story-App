@@ -1,10 +1,18 @@
 package com.raytalktech.storyapp.data.source
 
 import androidx.lifecycle.LiveData
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
+import com.raytalktech.storyapp.data.source.database.AppDatabase
+import com.raytalktech.storyapp.data.source.database.AppRemoteMediator
 import com.raytalktech.storyapp.data.source.local.UserPreference
 import com.raytalktech.storyapp.data.source.remote.ApiResponse
 import com.raytalktech.storyapp.data.source.remote.RemoteDataSource
 import com.raytalktech.storyapp.model.DataResponse
+import com.raytalktech.storyapp.model.StoriesResult
 import com.raytalktech.storyapp.model.UserModel
 import com.raytalktech.storyapp.utils.AppExecutors
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +21,8 @@ import okhttp3.MultipartBody
 class DataRepository private constructor(
     private val appExecutors: AppExecutors,
     private val remoteDataSource: RemoteDataSource,
-    private val dataStore: UserPreference
+    private val dataStore: UserPreference,
+    private val appDatabase: AppDatabase
 ) : DataSource {
 
     companion object {
@@ -23,10 +32,11 @@ class DataRepository private constructor(
         fun getInstance(
             remoteData: RemoteDataSource,
             appExecutors: AppExecutors,
-            userPreference: UserPreference
+            userPreference: UserPreference,
+            appDatabase: AppDatabase
         ): DataRepository = instance ?: synchronized(this) {
             instance ?: DataRepository(
-                appExecutors, remoteData, userPreference
+                appExecutors, remoteData, userPreference, appDatabase
             )
         }
     }
@@ -73,5 +83,16 @@ class DataRepository private constructor(
         longitude: Float
     ): LiveData<ApiResponse<DataResponse>> {
         return remoteDataSource.postStories(token, file, description, latitude, longitude)
+    }
+
+    override fun getAllFeed(): LiveData<PagingData<StoriesResult>> {
+        @OptIn(ExperimentalPagingApi::class)
+        return Pager(
+            config = PagingConfig(pageSize = 5),
+            remoteMediator = AppRemoteMediator(appDatabase, remoteDataSource.client),
+            pagingSourceFactory = { //AppPagingSource(remoteDataSource.client)
+                appDatabase.appDao().getAllQuote()
+            }
+        ).liveData
     }
 }

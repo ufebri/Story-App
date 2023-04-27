@@ -1,6 +1,7 @@
 package com.raytalktech.storyapp.network
 
 import com.raytalktech.storyapp.model.DataResponse
+import com.raytalktech.storyapp.model.StoriesResult
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -30,6 +31,14 @@ interface ApiService {
         @Query("size") size: Int? = null,
         @Query("location") location: Int? = null
     ): Call<DataResponse>
+
+    @GET("stories")
+    suspend fun allFeeds(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+        @Query("location") location: Int? = null
+    ): DataResponse
 
     @GET("stories/{id}")
     fun detailFeed(

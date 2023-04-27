@@ -1,8 +1,10 @@
 package com.raytalktech.storyapp.data.source
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingData
 import com.raytalktech.storyapp.data.source.remote.ApiResponse
 import com.raytalktech.storyapp.model.DataResponse
+import com.raytalktech.storyapp.model.StoriesResult
 import com.raytalktech.storyapp.model.UserModel
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
@@ -41,4 +43,6 @@ interface DataSource {
         latitude: Float,
         longitude: Float
     ): LiveData<ApiResponse<DataResponse>>
+
+    fun getAllFeed(): LiveData<PagingData<StoriesResult>>
 }

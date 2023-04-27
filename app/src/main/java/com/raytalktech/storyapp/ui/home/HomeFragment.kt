@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.raytalktech.storyapp.data.source.remote.ApiResponse
@@ -18,8 +19,14 @@ import com.raytalktech.storyapp.databinding.BottomsheetDetailStoriesBinding
 import com.raytalktech.storyapp.databinding.FragmentHomeBinding
 import com.raytalktech.storyapp.model.DataResponse
 import com.raytalktech.storyapp.model.StoriesResult
+import com.raytalktech.storyapp.ui.adapter.LoadingStateAdapter
 import com.raytalktech.storyapp.ui.adapter.StoriesFeedAdapter
-import com.raytalktech.storyapp.utils.*
+import com.raytalktech.storyapp.utils.ViewModelFactory
+import com.raytalktech.storyapp.utils.checkPermission
+import com.raytalktech.storyapp.utils.getShortName
+import com.raytalktech.storyapp.utils.requestPermission
+import com.raytalktech.storyapp.utils.showCustomBottomSheet
+import com.raytalktech.storyapp.utils.toHumanReadable
 
 class HomeFragment : Fragment() {
 
@@ -42,45 +49,37 @@ class HomeFragment : Fragment() {
             val factory = ViewModelFactory.getInstance(requireActivity())
             viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
-            showTheMainView()
+            if (checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                showTheMainView()
+            } else {
+                requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, 12) { isGranted ->
+                    if (isGranted) {
+                        showTheMainView()
+                    } else {
+                        Toast.makeText(requireActivity(), "kenapa dah", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
         }
     }
 
     private fun showTheMainView() {
-        if (checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            viewModel.getStoriesData().observe(viewLifecycleOwner, storiesList)
-        } else {
-            requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, 12) { isGranted ->
-                if (isGranted) {
-                    viewModel.getStoriesData().observe(viewLifecycleOwner, storiesList)
-                } else {
-                    Toast.makeText(requireActivity(), "kenapa dah", Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-    }
+        binding.rvMain.apply {
+            layoutManager = LinearLayoutManager(context)
+            val mAdapter = StoriesFeedAdapter(onItemClick = { data ->
+                viewModel.getDetailStoriesData(data.id)
+                    .observe(requireActivity(), detailStories)
+            })
 
-    private val storiesList = Observer<ApiResponse<DataResponse>> { result ->
-        when (result.status) {
-            StatusResponse.EMPTY -> {
-                Toast.makeText(requireActivity(), "kenapa dah kosong", Toast.LENGTH_LONG).show()
-            }
-            StatusResponse.ERROR -> {
-                Toast.makeText(requireActivity(), "kenapa dah error", Toast.LENGTH_LONG).show()
-            }
-            StatusResponse.SUCCESS -> {
-                binding.rvMain.apply {
-                    layoutManager = LinearLayoutManager(context)
-                    val mData: List<StoriesResult>? = result.body.storiesResult
-
-                    if (mData != null) {
-                        adapter = StoriesFeedAdapter(mData) { data ->
-                            viewModel.getDetailStoriesData(data.id)
-                                .observe(requireActivity(), detailStories)
-                        }
-                    }
+            adapter = mAdapter.withLoadStateFooter(
+                footer = LoadingStateAdapter {
+                    mAdapter.retry()
                 }
-            }
+            )
+
+            viewModel.stories.observe(requireActivity(), Observer<PagingData<StoriesResult>> {
+                    mData -> mAdapter.submitData(lifecycle, mData)
+            })
         }
     }
 
