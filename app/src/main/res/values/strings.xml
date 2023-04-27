@@ -17,6 +17,7 @@
     <string name="name_error_rules">Name is required</string>
     <string name="password_error_rules">Minimal 8 Character</string>
     <string name="email_error_rules">Email is required</string>
+    <string name="email_error_format">Wrong Email Format</string>
 
 
     <string name="home">Home</string>

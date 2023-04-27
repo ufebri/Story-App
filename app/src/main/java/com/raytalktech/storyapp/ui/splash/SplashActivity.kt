@@ -16,6 +16,7 @@ import com.raytalktech.storyapp.model.UserModel
 import com.raytalktech.storyapp.ui.login.LoginActivity
 import com.raytalktech.storyapp.ui.main.MainActivity
 import com.raytalktech.storyapp.ui.main.MainViewModel
+import com.raytalktech.storyapp.utils.Constants.token
 import com.raytalktech.storyapp.utils.ViewModelFactory
 
 class SplashActivity : AppCompatActivity() {
@@ -53,6 +54,7 @@ class SplashActivity : AppCompatActivity() {
     private val goTo = Observer<UserModel> { user ->
         if (user.isLogin) {
             startActivity(Intent(this, MainActivity::class.java))
+            token = user.token
             finish()
         } else {
             startActivity(Intent(this, LoginActivity::class.java))

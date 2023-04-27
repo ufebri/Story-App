@@ -20,6 +20,7 @@ import com.raytalktech.storyapp.model.DataResponse
 import com.raytalktech.storyapp.model.UserModel
 import com.raytalktech.storyapp.ui.main.MainActivity
 import com.raytalktech.storyapp.ui.register.RegisterActivity
+import com.raytalktech.storyapp.utils.Constants
 import com.raytalktech.storyapp.utils.ViewModelFactory
 import com.raytalktech.storyapp.utils.makeClickableSpan
 
@@ -39,39 +40,14 @@ class LoginActivity : AppCompatActivity() {
 
         val factory = ViewModelFactory.getInstance(this)
         viewModel = ViewModelProvider(this, factory)[LoginViewModel::class.java]
-        viewModel.getUser().observe(this, {user -> this.user = user})
+        viewModel.getUser().observe(this, { user -> this.user = user })
 
         binding.apply {
             //Validation Email
-            edLoginEmail.doOnTextChanged { text, _, _, _ ->
-                binding.tilLoginEmail.let {
-                    it.error = if (text.toString().isEmpty()) {
-                        it.isErrorEnabled = true
-                        getString(R.string.email_error_rules)
-                    } else {
-                        it.isErrorEnabled = false
-                        null
-                    }
-                }
-                validate()
-            }
+            edLoginEmail.doOnTextChanged { _, _, _, _ -> validate() }
 
             //Validation Password
-            edLoginPassword.doOnTextChanged { _, _, _, _ ->
-                binding.tilLoginPassword.let {
-                    when (!binding.edLoginPassword.isCharacterPasswordValid) {
-                        true -> {
-                            it.isErrorEnabled = true
-                            it.error = getString(R.string.password_error_rules)
-                        }
-                        false -> {
-                            it.isErrorEnabled = false
-                            it.error = null
-                        }
-                    }
-                }
-                validate()
-            }
+            edLoginPassword.doOnTextChanged { _, _, _, _ -> validate() }
 
             btnLogin.setOnClickListener { submitLogin() }
 
@@ -99,10 +75,12 @@ class LoginActivity : AppCompatActivity() {
         var isValid = true
 
         //isn't valid if error still show up
-        if (binding.edLoginEmail.error != null) isValid = false
-        if (binding.edLoginPassword.error != null) isValid = false
+        binding.apply {
+            if (edLoginEmail.error != null || edLoginEmail.text.toString().isEmpty()) isValid = false
+            if (edLoginPassword.error != null || edLoginPassword.text.toString().isEmpty()) isValid = false
 
-        binding.btnLogin.isEnabled = isValid
+            btnLogin.isEnabled = isValid
+        }
     }
 
     private fun submitLogin() {
@@ -135,6 +113,7 @@ class LoginActivity : AppCompatActivity() {
                             result.body.loginResult!!.token
                         )
                     )
+                    Constants.token = result.body.loginResult!!.token
                 }
 
                 startActivity(Intent(this@LoginActivity, MainActivity::class.java))

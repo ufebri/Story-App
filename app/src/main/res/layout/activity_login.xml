@@ -40,7 +40,7 @@
         app:layout_constraintTop_toBottomOf="@id/tv_title_login"
         app:startIconDrawable="@drawable/baseline_alternate_email_24">
 
-        <EditText
+        <com.raytalktech.storyapp.customui.CustomEditText
             android:id="@+id/ed_login_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

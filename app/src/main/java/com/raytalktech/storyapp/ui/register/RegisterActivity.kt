@@ -15,10 +15,7 @@ import com.raytalktech.storyapp.databinding.ActivityRegisterBinding
 import com.raytalktech.storyapp.model.DataResponse
 import com.raytalktech.storyapp.model.LoginResult
 import com.raytalktech.storyapp.model.UserModel
-import com.raytalktech.storyapp.utils.ViewModelFactory
-import com.raytalktech.storyapp.utils.makeClickableSpan
-import com.raytalktech.storyapp.utils.showAlertOneAction
-import com.raytalktech.storyapp.utils.showAlertTwoAction
+import com.raytalktech.storyapp.utils.*
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -51,35 +48,10 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             //Validation Email
-            edRegisterEmail.doOnTextChanged { text, _, _, _ ->
-                tilRegisterEmail.let {
-                    it.error = if (text.toString().isEmpty()) {
-                        it.isErrorEnabled = true
-                        getString(R.string.email_error_rules)
-                    } else {
-                        it.isErrorEnabled = false
-                        null
-                    }
-                }
-                validate()
-            }
+            edRegisterEmail.doOnTextChanged { _, _, _, _ -> validate() }
 
             //Validation Password
-            edRegisterPassword.doOnTextChanged { _, _, _, _ ->
-                tilRegisterPassword.let {
-                    when (!edRegisterPassword.isCharacterPasswordValid) {
-                        true -> {
-                            it.isErrorEnabled = true
-                            it.error = getString(R.string.password_error_rules)
-                        }
-                        false -> {
-                            it.isErrorEnabled = false
-                            it.error = null
-                        }
-                    }
-                }
-                validate()
-            }
+            edRegisterPassword.doOnTextChanged { _, _, _, _ -> validate() }
 
             btnRegister.setOnClickListener { submitRegister() }
 
@@ -96,8 +68,12 @@ class RegisterActivity : AppCompatActivity() {
         binding.apply {
             //isn't valid if error still show up
             if (edRegisterName.error != null) isValid = false
-            if (edRegisterEmail.error != null) isValid = false
-            if (edRegisterPassword.error != null) isValid = false
+            if (edRegisterEmail.error != null || edRegisterEmail.text.toString()
+                    .isEmpty()
+            ) isValid = false
+            if (edRegisterPassword.error != null || edRegisterPassword.text.toString()
+                    .isEmpty()
+            ) isValid = false
 
             btnRegister.isEnabled = isValid
         }
@@ -180,6 +156,7 @@ class RegisterActivity : AppCompatActivity() {
                     token
                 )
             )
+            Constants.token = token
         }
     }
 }
