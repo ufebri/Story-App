@@ -54,7 +54,7 @@ class DataRepository private constructor(
     override suspend fun logout() = dataStore.logout()
 
     override fun getFeedStories(
-        token: String, page: Int, size: Int, location: Int
+        token: String, page: Int?, size: Int?, location: Int?
     ): LiveData<ApiResponse<DataResponse>> {
         return remoteDataSource.storiesFeed(token, page, size, location)
     }
