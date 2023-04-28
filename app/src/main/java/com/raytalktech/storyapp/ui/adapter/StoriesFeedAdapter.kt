@@ -12,7 +12,7 @@ class StoriesFeedAdapter(private val onItemClick: (StoriesResult) -> Unit) :
     PagingDataAdapter<StoriesResult, FeedViewHolder>(DIFF_CALLBACK) {
 
     companion object {
-        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoriesResult>() {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoriesResult>() {
             override fun areItemsTheSame(oldItem: StoriesResult, newItem: StoriesResult): Boolean {
                 return oldItem == newItem
             }
