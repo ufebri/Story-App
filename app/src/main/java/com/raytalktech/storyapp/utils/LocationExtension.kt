@@ -11,7 +11,7 @@ import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 
 fun Context.getCurrentLocation(onLocationResult: (Location) -> Unit) {
     val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)

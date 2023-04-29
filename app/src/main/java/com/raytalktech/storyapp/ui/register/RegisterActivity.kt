@@ -15,7 +15,11 @@ import com.raytalktech.storyapp.databinding.ActivityRegisterBinding
 import com.raytalktech.storyapp.model.DataResponse
 import com.raytalktech.storyapp.model.LoginResult
 import com.raytalktech.storyapp.model.UserModel
-import com.raytalktech.storyapp.utils.*
+import com.raytalktech.storyapp.utils.Constants
+import com.raytalktech.storyapp.utils.ViewModelFactory
+import com.raytalktech.storyapp.utils.makeClickableSpan
+import com.raytalktech.storyapp.utils.showAlertOneAction
+import com.raytalktech.storyapp.utils.showAlertTwoAction
 
 class RegisterActivity : AppCompatActivity() {
 
