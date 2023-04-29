@@ -79,7 +79,7 @@ class RemoteDataSource {
 
 
     fun storiesFeed(
-        token: String, page: Int, size: Int, location: Int
+        token: String, page: Int?, size: Int?, location: Int?
     ): LiveData<ApiResponse<DataResponse>> {
         val resultData = MutableLiveData<ApiResponse<DataResponse>>()
         client.allFeed("bearer $token", page, size, location)

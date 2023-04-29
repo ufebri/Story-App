@@ -29,9 +29,9 @@ interface DataSource {
 
     fun getFeedStories(
         token: String,
-        page: Int,
-        size: Int,
-        location: Int
+        page: Int?,
+        size: Int?,
+        location: Int?
     ): LiveData<ApiResponse<DataResponse>>
 
     fun getDetailFeedStories(token: String, id: String): LiveData<ApiResponse<DataResponse>>
