@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -28,7 +29,6 @@ import com.raytalktech.storyapp.data.source.remote.ApiResponse
 import com.raytalktech.storyapp.data.source.remote.StatusResponse
 import com.raytalktech.storyapp.databinding.FragmentAddStoryBinding
 import com.raytalktech.storyapp.model.DataResponse
-import com.raytalktech.storyapp.model.UserModel
 import com.raytalktech.storyapp.utils.ViewModelFactory
 import com.raytalktech.storyapp.utils.checkPermission
 import com.raytalktech.storyapp.utils.getCurrentLocation
@@ -40,7 +40,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 class AddStoryFragment : Fragment() {
 
@@ -48,7 +48,6 @@ class AddStoryFragment : Fragment() {
     private val binding get() = _binding
     private lateinit var viewModel: AddStoryViewModel
     private lateinit var currentPhotoPath: String
-    private lateinit var mToken: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +67,6 @@ class AddStoryFragment : Fragment() {
 
 
             if (checkPermission(Manifest.permission.CAMERA)) {
-                viewModel.getUser().observe(viewLifecycleOwner, getToken)
                 startTakePhoto()
             } else {
                 requestPermission(Manifest.permission.CAMERA, 12) { isGranted ->
@@ -80,10 +78,6 @@ class AddStoryFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private val getToken = androidx.lifecycle.Observer<UserModel> { user ->
-        user.let { mToken = it.token }
     }
 
     private fun startTakePhoto() {
@@ -110,7 +104,7 @@ class AddStoryFragment : Fragment() {
 
             myFile.let { file ->
                 binding.apply {
-                    rotateFile(file, true)
+                    rotateFile(file)
                     val reduceFile = reduceFileImage(file)
 
                     ivResultPhoto.setImageBitmap(BitmapFactory.decodeFile(reduceFile.path))
@@ -144,7 +138,6 @@ class AddStoryFragment : Fragment() {
             btnUpload.setOnClickListener {
                 pbView.isVisible = true
                 viewModel.postStories(
-                    mToken,
                     imageMultipart,
                     etDescription.text.toString(),
                     latitude,
@@ -191,23 +184,49 @@ class AddStoryFragment : Fragment() {
         return File.createTempFile(timeStamp, ".jpg", storageDir)
     }
 
-    private fun rotateFile(file: File, isBackCamera: Boolean = false) {
+    private fun rotateFile(file: File) {
         val matrix = Matrix()
         val bitmap = BitmapFactory.decodeFile(file.path)
-        val rotation = if (isBackCamera) 90f else -90f
-        matrix.postRotate(rotation)
-        if (!isBackCamera) {
-            matrix.postScale(-1f, 1f, bitmap.width / 2f, bitmap.height / 2f)
+
+        // Determine the camera position from the EXIF data
+        val exif = ExifInterface(file.path)
+        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        val isBackCamera = when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> true
+            ExifInterface.ORIENTATION_ROTATE_270 -> false
+            else -> null // Unknown camera position
         }
+
+        // Apply rotation and/or mirror transformation based on the camera position
+        if (isBackCamera != null) {
+            val rotation = if (isBackCamera) 90f else -90f
+            matrix.postRotate(rotation)
+            if (!isBackCamera) {
+                matrix.postScale(-1f, 1f, bitmap.width / 2f, bitmap.height / 2f)
+            }
+        }
+
+        // Apply the transformation to the bitmap
         val result = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-        result.compress(Bitmap.CompressFormat.JPEG, 100, FileOutputStream(file))
+
+        // Save the transformed bitmap back to the file
+        FileOutputStream(file).use { out ->
+            result.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+        }
+
+        // Recycle the bitmap to release memory
+        bitmap.recycle()
+        result.recycle()
     }
 
     private val MAXIMAL_SIZE = 1000000
     private fun reduceFileImage(file: File): File {
         val bitmap = BitmapFactory.decodeFile(file.path)
+
         var compressQuality = 100
         var streamLength: Int
+
         do {
             val bmpStream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, bmpStream)
@@ -215,6 +234,7 @@ class AddStoryFragment : Fragment() {
             streamLength = bmpPicByteArray.size
             compressQuality -= 5
         } while (streamLength > MAXIMAL_SIZE)
+
         bitmap.compress(Bitmap.CompressFormat.JPEG, compressQuality, FileOutputStream(file))
 
         return file
