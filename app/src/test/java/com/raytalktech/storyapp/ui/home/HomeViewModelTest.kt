@@ -58,27 +58,7 @@ class HomeViewModelTest {
 
         Assert.assertNotNull(differ.snapshot())
         Assert.assertEquals(dummyQuote.size, differ.snapshot().size)
-        Assert.assertEquals(dummyQuote[0].name, differ.snapshot()[0]?.name)
-    }
-
-    @Test
-    fun `when Get Quote Should Not Null`() = runTest {
-        val dummyQuote = DataDummy.generateDummyQuoteResponse()
-        val data: PagingData<StoriesResult> = QuotePagingSource.snapshot(dummyQuote)
-        val expectedQuote = MutableLiveData<PagingData<StoriesResult>>()
-        expectedQuote.value = data
-
-        Mockito.`when`(dataRepository.getAllFeed()).thenReturn(expectedQuote)
-        val mainViewModel = HomeViewModel(dataRepository)
-        val actualQuote: PagingData<StoriesResult> = mainViewModel.stories.getOrAwaitValue()
-
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = StoriesFeedAdapter.DIFF_CALLBACK,
-            updateCallback = noopListUpdateCallback,
-            workerDispatcher = Dispatchers.Main,
-        )
-        differ.submitData(actualQuote)
-
+        Assert.assertEquals(dummyQuote[0], differ.snapshot()[0])
     }
 
     @Test

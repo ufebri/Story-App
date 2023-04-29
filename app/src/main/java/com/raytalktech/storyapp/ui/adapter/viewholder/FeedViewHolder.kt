@@ -23,8 +23,12 @@ class FeedViewHolder(
             location.latitude = item.lat
             location.longitude = item.lon
 
-            tvItemName.text =
-                String.format("%s\n%s", item.name, location.getShortName(itemView.context))
+            try {
+                tvItemName.text =
+                    String.format("%s\n%s", item.name, location.getShortName(itemView.context))
+            } catch (e: Exception) {
+                tvItemName.text = item.name
+            }
 
             //Passing the Data
             itemView.setOnClickListener { onItemClick(item) }
