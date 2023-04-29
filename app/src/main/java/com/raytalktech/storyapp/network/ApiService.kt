@@ -31,6 +31,14 @@ interface ApiService {
         @Query("location") location: Int? = null
     ): Call<DataResponse>
 
+    @GET("stories")
+    suspend fun allFeeds(
+        @Header("Authorization") token: String,
+        @Query("page") page: Int? = null,
+        @Query("size") size: Int? = null,
+        @Query("location") location: Int? = null
+    ): DataResponse
+
     @GET("stories/{id}")
     fun detailFeed(
         @Header("Authorization") token: String,

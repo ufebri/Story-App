@@ -13,8 +13,9 @@ import retrofit2.Response
 
 class RemoteDataSource {
 
+    val client = ApiConfig.getApiService()
+
     companion object {
-        private val client = ApiConfig.getApiService()
         private const val TAG = "RemoteDataSource"
 
 

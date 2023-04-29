@@ -2,17 +2,29 @@ package com.raytalktech.storyapp.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import com.raytalktech.storyapp.databinding.ItemFeedStoriesBinding
 import com.raytalktech.storyapp.model.StoriesResult
 import com.raytalktech.storyapp.ui.adapter.viewholder.FeedViewHolder
 
-class StoriesFeedAdapter(
-    private val list: List<StoriesResult>,
-    private val onItemClick: (StoriesResult) -> Unit
-) :
-    RecyclerView.Adapter<FeedViewHolder>() {
+class StoriesFeedAdapter(private val onItemClick: (StoriesResult) -> Unit) :
+    PagingDataAdapter<StoriesResult, FeedViewHolder>(DIFF_CALLBACK) {
 
+    companion object {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoriesResult>() {
+            override fun areItemsTheSame(oldItem: StoriesResult, newItem: StoriesResult): Boolean {
+                return oldItem == newItem
+            }
+
+            override fun areContentsTheSame(
+                oldItem: StoriesResult,
+                newItem: StoriesResult
+            ): Boolean {
+                return oldItem.id == newItem.id
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
         val binding =
@@ -20,9 +32,6 @@ class StoriesFeedAdapter(
         return FeedViewHolder(binding, onItemClick)
     }
 
-    override fun getItemCount(): Int = list.size
-
     override fun onBindViewHolder(holder: FeedViewHolder, position: Int) =
-        itemCount.let { holder.bind(list[position]) }
-
+        itemCount.let { holder.bind(getItem(position)!!) }
 }
