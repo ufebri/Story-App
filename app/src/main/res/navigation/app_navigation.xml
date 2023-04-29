@@ -23,4 +23,10 @@
         android:label="@string/add_stories"
         tools:layout="@layout/fragment_add_story" />
 
+    <fragment
+        android:id="@+id/navigation_explore"
+        android:name="com.raytalktech.storyapp.ui.explore.ExploreFragment"
+        android:label="@string/explore"
+        tools:layout="@layout/fragment_explore" />
+
 </navigation>
