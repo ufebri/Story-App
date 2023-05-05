@@ -10,12 +10,19 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import java.io.IOException
 import java.util.Locale
 
 fun Context.getCurrentLocation(onLocationResult: (Location) -> Unit) {
-    val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    val fusedLocationClient: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(this)
+    if (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
         // Handle permissions
         return
     }
@@ -29,13 +36,14 @@ fun Context.getCurrentLocation(onLocationResult: (Location) -> Unit) {
 fun Location.getShortName(context: Context): String? {
     return try {
         val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses: MutableList<Address>? = geocoder.getFromLocation(latitude, longitude, 1) as? MutableList<Address>
+        val addresses: MutableList<Address>? =
+            geocoder.getFromLocation(latitude, longitude, 1) as? MutableList<Address>
         var address: Address? = null
         if (addresses != null && addresses.isNotEmpty()) {
             address = addresses[0]
         }
         address?.adminArea
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         Log.d("TAG", "getShortName: ${e.localizedMessage}")
         null
     }
