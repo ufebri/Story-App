@@ -32,6 +32,8 @@ class StoriesFeedAdapter(private val onItemClick: (StoriesResult) -> Unit) :
         return FeedViewHolder(binding, onItemClick)
     }
 
-    override fun onBindViewHolder(holder: FeedViewHolder, position: Int) =
-        itemCount.let { holder.bind(getItem(position)!!) }
+    override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
+        val mData = getItem(position)
+        if (mData != null) itemCount.let { holder.bind(mData) }
+    }
 }
