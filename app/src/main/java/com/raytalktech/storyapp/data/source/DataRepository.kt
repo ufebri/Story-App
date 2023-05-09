@@ -79,8 +79,8 @@ class DataRepository private constructor(
         token: String,
         description: String,
         file: MultipartBody.Part,
-        latitude: Float,
-        longitude: Float
+        latitude: Float?,
+        longitude: Float?
     ): LiveData<ApiResponse<DataResponse>> {
         return remoteDataSource.postStories(token, file, description, latitude, longitude)
     }

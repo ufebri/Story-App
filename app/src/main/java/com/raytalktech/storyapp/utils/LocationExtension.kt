@@ -32,19 +32,3 @@ fun Context.getCurrentLocation(onLocationResult: (Location) -> Unit) {
         }
     }
 }
-
-fun Location.getShortName(context: Context): String? {
-    return try {
-        val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses: MutableList<Address>? =
-            geocoder.getFromLocation(latitude, longitude, 1) as? MutableList<Address>
-        var address: Address? = null
-        if (addresses != null && addresses.isNotEmpty()) {
-            address = addresses[0]
-        }
-        address?.adminArea
-    } catch (e: Exception) {
-        Log.d("TAG", "getShortName: ${e.localizedMessage}")
-        null
-    }
-}

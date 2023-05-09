@@ -23,7 +23,7 @@ class AppPagingSource(private val apiService: ApiService) : PagingSource<Int, St
         return try {
             val position = params.key ?: INITIAL_PAGE_INDEX
             val responseData =
-                apiService.allFeeds("bearer $token", page = 5, size = params.loadSize, 1)
+                apiService.allFeeds("bearer $token", page = 5, size = params.loadSize, 0)
 
             LoadResult.Page(
                 data = responseData.storiesResult!!,

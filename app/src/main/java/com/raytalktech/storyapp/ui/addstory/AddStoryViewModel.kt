@@ -13,8 +13,8 @@ class AddStoryViewModel(private val dataRepository: DataRepository) : ViewModel(
     fun postStories(
         file: MultipartBody.Part,
         description: String,
-        latitude: Float,
-        longitude: Float
+        latitude: Float?,
+        longitude: Float?
     ): LiveData<ApiResponse<DataResponse>> =
         dataRepository.postStories(token, description, file, latitude, longitude)
 }

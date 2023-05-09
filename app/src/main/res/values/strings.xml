@@ -12,6 +12,8 @@
     <string name="text_general_login">Login</string>
     <string name="text_general_signup">Sign up</string>
     <string name="text_general_name">Name</string>
+    <string name="text_general_cancel">Cancel</string>
+    <string name="text_general_ok">OK</string>
 
     <!--  Error Rules  -->
     <string name="name_error_rules">Name is required</string>
@@ -28,6 +30,13 @@
     <string name="add_stories">Post</string>
     <string name="retry">Try Again</string>
     <string name="explore">Explore</string>
+    <string name="settings">Settings</string>
+
+    <!--  Permission Rationale Message  -->
+    <string name="rationale_message_location">Location permission is needed to show your current location on the map.</string>
+    <string name="rationale_button_grant">Grant Permission</string>
+    <string name="rationale_message_general">You need to grant of permission to use this feature</string>
+    <string name="rationale_title_permission">Permission Required</string>
 
 
 </resources>

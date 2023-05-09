@@ -1,12 +1,9 @@
 package com.raytalktech.storyapp.ui.home
 
-import android.Manifest
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -22,9 +19,6 @@ import com.raytalktech.storyapp.model.StoriesResult
 import com.raytalktech.storyapp.ui.adapter.LoadingStateAdapter
 import com.raytalktech.storyapp.ui.adapter.StoriesFeedAdapter
 import com.raytalktech.storyapp.utils.ViewModelFactory
-import com.raytalktech.storyapp.utils.checkPermission
-import com.raytalktech.storyapp.utils.getShortName
-import com.raytalktech.storyapp.utils.requestPermission
 import com.raytalktech.storyapp.utils.showCustomBottomSheet
 import com.raytalktech.storyapp.utils.toHumanReadable
 
@@ -49,17 +43,7 @@ class HomeFragment : Fragment() {
             val factory = ViewModelFactory.getInstance(requireActivity())
             viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
-            if (checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                showTheMainView()
-            } else {
-                requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, 12) { isGranted ->
-                    if (isGranted) {
-                        showTheMainView()
-                    } else {
-                        Toast.makeText(requireActivity(), "kenapa dah", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
+            showTheMainView()
         }
     }
 
@@ -77,9 +61,11 @@ class HomeFragment : Fragment() {
                 }
             )
 
-            viewModel.stories.observe(requireActivity(), Observer<PagingData<StoriesResult>> {
-                    mData -> mAdapter.submitData(lifecycle, mData)
-            })
+            viewModel.stories.observe(
+                requireActivity(),
+                Observer<PagingData<StoriesResult>> { mData ->
+                    mAdapter.submitData(lifecycle, mData)
+                })
         }
     }
 
@@ -99,15 +85,7 @@ class HomeFragment : Fragment() {
                     tvDetailDescription.text = mData.description
                     tvDetailName.text = mData.name
 
-                    val location = Location("")
-                    location.latitude = mData.lat
-                    location.longitude = mData.lon
-
-                    tvDetailLocation.text = String.format(
-                        "%s - %s",
-                        location.getShortName(requireActivity()),
-                        mData.createdAt.toHumanReadable()
-                    )
+                    tvDetailLocation.text = mData.createdAt.toHumanReadable()
                 }
             })
         }

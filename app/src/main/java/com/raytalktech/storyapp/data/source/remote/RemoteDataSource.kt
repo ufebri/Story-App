@@ -129,35 +129,38 @@ class RemoteDataSource {
         token: String,
         file: MultipartBody.Part,
         description: String,
-        latitude: Float,
-        longitude: Float
+        latitude: Float?,
+        longitude: Float?
     ): LiveData<ApiResponse<DataResponse>> {
         val resultData = MutableLiveData<ApiResponse<DataResponse>>()
+
+        val mLat = latitude?.toString()?.toRequestBody(MultipartBody.FORM)
+        val mLon = longitude?.toString()?.toRequestBody(MultipartBody.FORM)
 
         client.postStories(
             "bearer $token",
             file,
             description.toRequestBody(MultipartBody.FORM),
-            latitude.toString().toRequestBody(MultipartBody.FORM),
-            longitude.toString().toRequestBody(MultipartBody.FORM)
+            mLat,
+            mLon
         ).enqueue(object : Callback<DataResponse> {
-                override fun onResponse(
-                    call: Call<DataResponse>, response: Response<DataResponse>
-                ) {
-                    if (response.body() != null) resultData.value =
-                        ApiResponse.success(response.body() as DataResponse)
-                    else if (response.errorBody() != null) resultData.value = ApiResponse.error(
-                        response.message(), DataResponse(true, response.message())
-                    )
-                    else resultData.value =
-                        ApiResponse.empty(response.message(), response.body() as DataResponse)
-                    getLog("onResponse: " + response.raw())
-                }
+            override fun onResponse(
+                call: Call<DataResponse>, response: Response<DataResponse>
+            ) {
+                if (response.body() != null) resultData.value =
+                    ApiResponse.success(response.body() as DataResponse)
+                else if (response.errorBody() != null) resultData.value = ApiResponse.error(
+                    response.message(), DataResponse(true, response.message())
+                )
+                else resultData.value =
+                    ApiResponse.empty(response.message(), response.body() as DataResponse)
+                getLog("onResponse: " + response.raw())
+            }
 
-                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                    getLog("onFailure: ${t.message}")
-                }
-            })
+            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                getLog("onFailure: ${t.message}")
+            }
+        })
         return resultData
     }
 }

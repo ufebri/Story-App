@@ -40,8 +40,8 @@ interface DataSource {
         token: String,
         description: String,
         file: MultipartBody.Part,
-        latitude: Float,
-        longitude: Float
+        latitude: Float?,
+        longitude: Float?
     ): LiveData<ApiResponse<DataResponse>>
 
     fun getAllFeed(): LiveData<PagingData<StoriesResult>>

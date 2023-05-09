@@ -50,8 +50,7 @@ class AddStoryFragment : Fragment() {
     private lateinit var currentPhotoPath: String
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAddStoryBinding.inflate(inflater, container, false)
         return binding.root
@@ -86,9 +85,7 @@ class AddStoryFragment : Fragment() {
 
         createCustomTempFile(requireActivity().application).also {
             val photoURI: Uri = FileProvider.getUriForFile(
-                requireActivity(),
-                "com.raytalktech.storyapp",
-                it
+                requireActivity(), "com.raytalktech.storyapp", it
             )
             currentPhotoPath = it.absolutePath
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
@@ -110,9 +107,7 @@ class AddStoryFragment : Fragment() {
                     ivResultPhoto.setImageBitmap(BitmapFactory.decodeFile(reduceFile.path))
                     val requestImageFile = reduceFile.asRequestBody("image/jpeg".toMediaType())
                     val imageMultipart: MultipartBody.Part = MultipartBody.Part.createFormData(
-                        "photo",
-                        reduceFile.name,
-                        requestImageFile
+                        "photo", reduceFile.name, requestImageFile
                     )
 
                     setupPostStories(imageMultipart)
@@ -125,42 +120,42 @@ class AddStoryFragment : Fragment() {
         binding.apply {
             etDescription.doOnTextChanged { _, _, _, _ -> validate() }
 
-            var latitude = 0f
-            var longitude = 0f
+            var latitude: Float? = null
+            var longitude: Float? = null
 
-            requireActivity().getCurrentLocation { location ->
-                location.let {
-                    latitude = it.latitude.toFloat()
-                    longitude = it.longitude.toFloat()
+
+            if (checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                requireActivity().getCurrentLocation { location ->
+                    location.let {
+                        latitude = it.latitude.toFloat()
+                        longitude = it.longitude.toFloat()
+                    }
                 }
             }
 
+
             btnUpload.setOnClickListener {
+                btnUpload.isEnabled = false
                 pbView.isVisible = true
                 viewModel.postStories(
-                    imageMultipart,
-                    etDescription.text.toString(),
-                    latitude,
-                    longitude
+                    imageMultipart, etDescription.text.toString(), latitude, longitude
                 ).observe(viewLifecycleOwner, postStories)
             }
         }
     }
 
-    private val postStories =
-        androidx.lifecycle.Observer<ApiResponse<DataResponse>> { result ->
-            when (result.status) {
-                StatusResponse.EMPTY -> {}
-                StatusResponse.ERROR -> {}
-                StatusResponse.SUCCESS -> {
-                    if (!result.body.error)
-                        findNavController().navigate(R.id.navigation_home)
+    private val postStories = androidx.lifecycle.Observer<ApiResponse<DataResponse>> { result ->
+        when (result.status) {
+            StatusResponse.EMPTY -> binding.btnUpload.isEnabled = true
+            StatusResponse.ERROR -> binding.btnUpload.isEnabled = true
+            StatusResponse.SUCCESS -> {
+                if (!result.body.error) findNavController().navigate(R.id.navigation_home)
 
-                    binding.pbView.isGone = true
-                    Toast.makeText(requireActivity(), result.body.message, Toast.LENGTH_LONG).show()
-                }
+                binding.pbView.isGone = true
+                Toast.makeText(requireActivity(), result.body.message, Toast.LENGTH_LONG).show()
             }
         }
+    }
 
     private fun validate() {
         binding.apply {
@@ -175,8 +170,7 @@ class AddStoryFragment : Fragment() {
     private val FILENAME_FORMAT = "dd-MMM-yyyy"
 
     private val timeStamp: String = SimpleDateFormat(
-        FILENAME_FORMAT,
-        Locale.US
+        FILENAME_FORMAT, Locale.US
     ).format(System.currentTimeMillis())
 
     private fun createCustomTempFile(context: Context): File {
@@ -190,7 +184,8 @@ class AddStoryFragment : Fragment() {
 
         // Determine the camera position from the EXIF data
         val exif = ExifInterface(file.path)
-        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        val orientation =
+            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
         val isBackCamera = when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> true
             ExifInterface.ORIENTATION_ROTATE_270 -> false

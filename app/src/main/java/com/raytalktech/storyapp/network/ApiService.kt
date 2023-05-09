@@ -51,7 +51,7 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Part file: MultipartBody.Part,
         @Part("description") description: RequestBody,
-        @Part("lat") latitude: RequestBody,
-        @Part("lon") longitude: RequestBody
+        @Part("lat") latitude: RequestBody? = null,
+        @Part("lon") longitude: RequestBody? = null
     ): Call<DataResponse>
 }
