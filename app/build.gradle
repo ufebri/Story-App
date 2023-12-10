@@ -6,6 +6,10 @@ plugins {
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
+def apikeyPropertiesFile = rootProject.file("config.properties")
+def configProperties = new Properties()
+configProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 android {
     namespace 'com.raytalktech.storyapp'
     compileSdk 33
@@ -23,8 +27,15 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue("string", "MAP_API_KEY", configProperties["MAP_API_KEY"])
+        }
+
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue("string", "MAP_API_KEY", configProperties["MAP_API_KEY"])
         }
     }
     compileOptions {
