@@ -123,10 +123,12 @@ class RegisterActivity : AppCompatActivity() {
 
                 showLoading(false)
             }
+
             StatusResponse.ERROR -> {
                 showAlertError(result.body.message)
                 showLoading(false)
             }
+
             StatusResponse.EMPTY -> {
                 showAlertError(result.body.message)
                 showLoading(false)
@@ -135,7 +137,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun showAlertError(message: String) {
-        showAlertOneAction("Oops...", message, "Got it", { dialog, _ -> dialog.dismiss() })
+        showAlertOneAction("Oops...", message, "Got it", { })
     }
 
     private fun showLoading(isShowing: Boolean) {

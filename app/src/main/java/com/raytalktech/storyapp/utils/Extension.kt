@@ -1,7 +1,6 @@
 package com.raytalktech.storyapp.utils
 
 import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.Spanned
@@ -99,7 +98,7 @@ fun Context.showAlertOneAction(
     title: String,
     message: String,
     positiveButtonText: String,
-    onPositiveButtonClick: ((DialogInterface, Int) -> Unit)? = null
+    onPositiveButtonClick: (() -> Unit)? = null
 ): AlertDialog {
 
     val binding = AlertGeneralOneActionBinding.inflate(LayoutInflater.from(this))
@@ -110,14 +109,20 @@ fun Context.showAlertOneAction(
     builder.setView(binding.root)
     builder.setCancelable(false)
 
+    val dialog = builder.create()
+    dialog.show()
+
     if (positiveButtonText.isNotEmpty()) {
         binding.btnOk.apply {
             text = positiveButtonText
-            setOnClickListener { onPositiveButtonClick }
+            setOnClickListener {
+                if (onPositiveButtonClick != null)
+                    dialog.cancel()
+            }
         }
     }
 
-    return builder.create().apply { show() }
+    return dialog
 }
 
 fun String.toHumanReadable(): String {

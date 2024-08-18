@@ -3,6 +3,7 @@ package com.raytalktech.storyapp.data.source.remote
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import com.raytalktech.storyapp.model.DataResponse
 import com.raytalktech.storyapp.network.ApiConfig
 import okhttp3.MultipartBody
@@ -61,10 +62,24 @@ class RemoteDataSource {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 if (response.body() != null) resultData.value =
                     ApiResponse.success(response.body() as DataResponse)
-                else if (response.errorBody() != null) resultData.value = ApiResponse.error(
-                    response.message(), DataResponse(true, response.message())
-                )
-                else resultData.value =
+                else if (response.errorBody() != null) {
+                    /**
+                     * To handle response from error body
+                     * we need parse the ErrorBody Response
+                     */
+
+                    val errorBody = response.errorBody()?.toString()
+                    var errorMsg: String? = null
+
+                    errorBody?.let {
+                        val gson = Gson()
+                        errorMsg = gson.fromJson(it, DataResponse::class.java).message
+                    }
+
+                    resultData.value = ApiResponse.error(
+                        errorMsg ?: response.message(), DataResponse(true, response.message())
+                    )
+                } else resultData.value =
                     ApiResponse.empty(response.message(), response.body() as DataResponse)
                 getLog("onResponse: " + response.raw())
             }
